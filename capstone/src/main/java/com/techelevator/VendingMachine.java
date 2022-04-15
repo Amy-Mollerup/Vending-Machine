@@ -2,15 +2,17 @@ package com.techelevator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class VendingMachine {
 
+
+
     public static Map<String, Product> catalogueItems() {
         File stockFile = new File("capstone/vendingmachine.csv");
-        Map<String, Product> inventory = new HashMap<>();
+        Map<String, Product> inventory = new TreeMap<>();
         try (Scanner reader = new Scanner(stockFile)) {
             while (reader.hasNextLine()) {
                 String productInfo = reader.nextLine();
@@ -21,24 +23,15 @@ public class VendingMachine {
                 String productType = infoSplit[3];
 
                 switch (productType) {
-                    case "Chip":
-                        inventory.put(productCode, new Chip(productName, productPrice));
-                        break;
-                    case "Candy":
-                        inventory.put(productCode, new Candy(productName, productPrice));
-                        break;
-                    case "Drink":
-                        inventory.put(productCode, new Drink(productName, productPrice));
-                        break;
-                    case "Gum":
-                        inventory.put(productCode, new Gum(productName, productPrice));
-                        break;
-                    default:
-                        throw new Exception("Unknown product type");
+                    case "Chip" -> inventory.put(productCode, new Chip(productName, productPrice));
+                    case "Candy" -> inventory.put(productCode, new Candy(productName, productPrice));
+                    case "Drink" -> inventory.put(productCode, new Drink(productName, productPrice));
+                    case "Gum" -> inventory.put(productCode, new Gum(productName, productPrice));
+                    default -> throw new Exception("Unknown product type");
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }

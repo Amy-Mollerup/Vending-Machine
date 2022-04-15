@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="m1-java-capstone-vending-machine" target="11" />
+      <module name="m1-java-capstone-vending-machine" target="14" />
     </bytecodeTargetLevel>
   </component>
 </project>
