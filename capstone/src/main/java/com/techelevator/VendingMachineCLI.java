@@ -1,6 +1,7 @@
 package com.techelevator;
 
 import com.techelevator.view.Menu;
+import com.techelevator.view.MenuException;
 
 import java.util.Map;
 import java.util.Scanner;
@@ -14,7 +15,7 @@ public class VendingMachineCLI {
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS, MAIN_MENU_OPTION_PURCHASE, MAIN_MENU_OPTION_EXIT };
 
 	// Use VendingMachine function to fill product list
-	private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
+	// private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
 
 	// Purchase Menu variable setup
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
@@ -35,7 +36,7 @@ public class VendingMachineCLI {
 
 			if (choice.equals(MAIN_MENU_OPTION_DISPLAY_ITEMS)) {
 				// display vending machine items
-				menu.displayStock(availableProducts);
+				menu.displayStock();
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				// do purchase
 				purchase();
@@ -56,21 +57,12 @@ public class VendingMachineCLI {
 				// feed money menu
 				menu.feedMoney(input);
 			} else if(choice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
-				// show products and allow customer to purchase
-				menu.displayStock(availableProducts);
-				String selection = input.nextLine();
-
-				if(!availableProducts.containsKey(selection)) {
-					System.out.println("Please select a valid product code.");
-					purchase();
-				} else if(availableProducts.get(selection).getStock() == 0){
-					System.out.println(selection + " is SOLD OUT, please select another.");
-					purchase();
-				} else {
-					menu.transaction(availableProducts.get(selection));
-					purchase();
+				menu.displayStock();
+				try {
+					menu.transaction(input);
+				} catch (MenuException e) {
+					System.out.println(e.getMessage() +"\n");
 				}
-
 			} else if(choice.equals(PURCHASE_MENU_OPTION_FINISH)) {
 				// exit the application
 				menu.finishTransaction();

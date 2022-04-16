@@ -9,12 +9,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class Menu {
 
 	private PrintWriter out;
 	private Scanner in;
 	private BigDecimal balance = new BigDecimal("0.00");
+	private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
 
 
 	public Menu(InputStream input, OutputStream output) {
@@ -63,7 +65,7 @@ public class Menu {
 		out.flush();
 	}
 
-	public void displayStock(Map<String, Product> availableProducts) {
+	public void displayStock() {
 		for(Map.Entry<String, Product> productKey : availableProducts.entrySet()) {
 			Product product = productKey.getValue();
 			if(product.getStock() > 0) {
@@ -111,26 +113,68 @@ public class Menu {
 		}
 	}
 
-	public void transaction(Product product) {
+	public void transaction(Scanner input) throws MenuException {
 		// Collects balance before subtracting product price
-		BigDecimal preCalculationBalance = balance;
-		balance = balance.subtract(product.getPrice());
+		String selection = input.nextLine();
+		Product product = availableProducts.get(selection);
+		BigDecimal proposedBalance;
 
-		// Checks to see if funds are sufficient and executes accordingly
-		if(balance.signum() > 0) { // If funds are sufficient
-			out.println("\n" + product.getName() + ": $" + product.getPrice() + "\n$" + balance+ " remaining");
-			out.flush();
-			product.dispense();
-		} else {
-			balance = balance.add(product.getPrice());
-			out.println("Insufficient funds. $" + balance.abs() + " required.");
-			out.flush();
+
+
+		// Checks if product exists
+
+		if (!availableProducts.containsKey(selection) || selection == null) {
+			throw new MenuException("*** " + selection + " is not a valid option ***");
 		}
 
-		// Clears the stream and audits the sale
-		auditLog(product.getName(), preCalculationBalance, balance);
+
+		// Checks if product is in stock
+		if (availableProducts.get(selection).getStock() == 0) {
+			throw new MenuException(product.getName() + " is SOLD OUT, please select another.");
+		}
+
+		// Checks if funds are sufficient
+		proposedBalance = balance.subtract(product.getPrice());
+		if (proposedBalance.signum() < 0) {
+			throw new MenuException("Insufficient funds. $" + proposedBalance.abs() + " more required.");
+		}
+
+		// Execute the transaction
+		BigDecimal preCalculationBalance = balance;
+		balance = balance.subtract(product.getPrice());
+		out.println("\n" + product.getName() + ": $" + product.getPrice() +
+				"\n$" + balance + " remaining");
+		out.flush();
+		product.dispense();
+		auditLog(product.getName(),  preCalculationBalance, balance);
+
 
 	}
+
+
+
+
+
+
+
+
+//
+//
+//		// Checks to see if funds are sufficient and executes accordingly
+//		if(balance.signum() > 0) { // If funds are sufficient
+//			out.println("\n" + product.getName() + ": $" + product.getPrice() + "\n$" + balance+ " remaining");
+//			out.flush();
+//			product.dispense();
+//		} else {
+//			balance = balance.add(product.getPrice());
+//			out.println("Insufficient funds. $" + balance.abs() + " required.");
+//			out.flush();
+//		}
+//
+//		// Clears the stream and audits the sale
+//		auditLog(product.getName(), preCalculationBalance, balance);
+
+//	}
 
 	public void finishTransaction() {
 		int quarters = 0;
