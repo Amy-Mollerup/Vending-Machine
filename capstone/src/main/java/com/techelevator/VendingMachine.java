@@ -2,6 +2,7 @@ package com.techelevator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -19,7 +20,7 @@ public class VendingMachine {
                 String[] infoSplit = productInfo.split("\\|");
                 String productCode = infoSplit[0];
                 String productName = infoSplit[1];
-                double productPrice = Double.parseDouble(infoSplit[2]);
+                BigDecimal productPrice = new BigDecimal(infoSplit[2]);
                 String productType = infoSplit[3];
 
                 switch (productType) {

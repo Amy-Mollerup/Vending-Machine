@@ -7,14 +7,16 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 public class VendingMachineCLI {
-
+	// Main Menu variable setup
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
 	private static final String MAIN_MENU_OPTION_PURCHASE = "Purchase";
 	private static final String MAIN_MENU_OPTION_EXIT = "Exit";
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS, MAIN_MENU_OPTION_PURCHASE, MAIN_MENU_OPTION_EXIT };
 
+	// Use VendingMachine function to fill product list
 	private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
 
+	// Purchase Menu variable setup
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
 	private static final String PURCHASE_MENU_OPTION_SELECT_PRODUCT = "Select Product";
 	private static final String PURCHASE_MENU_OPTION_FINISH = "Finish Transaction";
@@ -52,20 +54,10 @@ public class VendingMachineCLI {
 
 			if(choice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
 				// feed money menu
-				while(true) {
-					System.out.print("Please enter a whole dollar amount, without the '$' (1, 2, 5, or 10) >>> ");
-					if (input.hasNextInt()) {
-						System.out.println(menu.feedMoney(input.nextInt()));
-					} else if (input.nextLine().equalsIgnoreCase("x")){
-						purchase();
-					} else {
-						System.out.println("Please enter a valid amount or 'X'");
-					}
-				}
+				menu.feedMoney(input);
 			} else if(choice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
 				// show products and allow customer to purchase
 				menu.displayStock(availableProducts);
-				System.out.print("Please select an item: ");
 				String selection = input.nextLine();
 
 				if(!availableProducts.containsKey(selection)) {
