@@ -3,9 +3,7 @@ package com.techelevator;
 import com.techelevator.view.Menu;
 import com.techelevator.view.MenuException;
 
-import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 public class VendingMachineCLI {
 	// Main Menu variable setup
@@ -13,9 +11,6 @@ public class VendingMachineCLI {
 	private static final String MAIN_MENU_OPTION_PURCHASE = "Purchase";
 	private static final String MAIN_MENU_OPTION_EXIT = "Exit";
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS, MAIN_MENU_OPTION_PURCHASE, MAIN_MENU_OPTION_EXIT };
-
-	// Use VendingMachine function to fill product list
-	// private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
 
 	// Purchase Menu variable setup
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
@@ -36,7 +31,7 @@ public class VendingMachineCLI {
 
 			if (choice.equals(MAIN_MENU_OPTION_DISPLAY_ITEMS)) {
 				// display vending machine items
-				menu.displayStock();
+				menu.displayItems();
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				// do purchase
 				purchase();
@@ -44,6 +39,8 @@ public class VendingMachineCLI {
 			} else if (choice.equalsIgnoreCase(MAIN_MENU_OPTION_EXIT)) {
 				// exit the application
 				System.exit(0);
+			} else if (choice.equalsIgnoreCase("Generate sales report")) {
+				menu.generateSalesReport();
 			}
 		}
 	}
@@ -56,8 +53,10 @@ public class VendingMachineCLI {
 			if(choice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
 				// feed money menu
 				menu.feedMoney(input);
+
 			} else if(choice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
-				menu.displayStock();
+				menu.displayForPurchase();
+
 				try {
 					menu.transaction(input);
 				} catch (MenuException e) {

@@ -1,28 +1,31 @@
 package com.techelevator.view;
 
-import com.techelevator.Product;
-import com.techelevator.VendingMachine;
-import com.techelevator.VendingMachineCLI;
+import com.techelevator.*;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Menu {
 
 	private PrintWriter out;
 	private Scanner in;
 	private BigDecimal balance = new BigDecimal("0.00");
-	private static final Map<String, Product> availableProducts = new TreeMap<>(VendingMachine.catalogueItems());
+	private static final Map<String, Integer> salesLogger = new HashMap<>();
+	private static final Map<String, Product> availableProducts = new TreeMap<>(catalogueItems());
+
+
 
 
 	public Menu(InputStream input, OutputStream output) {
 		this.out = new PrintWriter(output);
 		this.in = new Scanner(input);
 	}
+
+
+	// ***** GENERAL MENU FUNCTIONS *****
+
 
 	public Object getChoiceFromOptions(Object[] options) {
 		Object choice = null;
@@ -40,6 +43,8 @@ public class Menu {
 			int selectedOption = Integer.valueOf(userInput);
 			if (selectedOption > 0 && selectedOption <= options.length) {
 				choice = options[selectedOption - 1];
+			} else if (selectedOption == options.length + 1) {
+				choice = "Generate sales report";
 			}
 		} catch (NumberFormatException e) {
 			// eat the exception, an error message will be displayed below since choice will be null
@@ -48,6 +53,36 @@ public class Menu {
 			out.println(System.lineSeparator() + "*** " + userInput + " is not a valid option ***" + System.lineSeparator());
 		}
 		return choice;
+	}
+
+	public static Map<String, Product> catalogueItems() {
+		File stockFile = new File("capstone/vendingmachine.csv");
+		Map<String, Product> inventory = new TreeMap<>();
+		try (Scanner reader = new Scanner(stockFile)) {
+			while (reader.hasNextLine()) {
+				String productInfo = reader.nextLine();
+				String[] infoSplit = productInfo.split("\\|");
+				String productCode = infoSplit[0];
+				String productName = infoSplit[1];
+				BigDecimal productPrice = new BigDecimal(infoSplit[2]);
+				String productType = infoSplit[3];
+
+				salesLogger.put(productName, 0);
+
+				switch (productType) {
+					case "Chip" -> inventory.put(productCode, new Chip(productName, productPrice));
+					case "Candy" -> inventory.put(productCode, new Candy(productName, productPrice));
+					case "Drink" -> inventory.put(productCode, new Drink(productName, productPrice));
+					case "Gum" -> inventory.put(productCode, new Gum(productName, productPrice));
+					default -> throw new Exception("Unknown product type");
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return inventory;
 	}
 
 	private void displayMenuOptions(Object[] options) {
@@ -65,7 +100,12 @@ public class Menu {
 		out.flush();
 	}
 
-	public void displayStock() {
+
+
+	// ***** MAIN MENU FUNCTION *****
+
+
+	public void displayItems() {
 		for(Map.Entry<String, Product> productKey : availableProducts.entrySet()) {
 			Product product = productKey.getValue();
 			if(product.getStock() > 0) {
@@ -74,9 +114,13 @@ public class Menu {
 				out.println(productKey.getKey() + " - " + product.getName() + " $" + String.format("%.2f", product.getPrice()) + " | SOLD OUT");
 			}
 		}
-		out.print("\nPlease select an item: ");
 		out.flush();
 	}
+
+
+
+	// ***** PURCHASE MENU FUNCTIONS *****
+
 
 	public void feedMoney(Scanner input) {
 		// updates balance and displays it to the user.
@@ -113,24 +157,32 @@ public class Menu {
 		}
 	}
 
+	public void displayForPurchase() {
+		displayItems();
+		out.print("\nPlease select an item: ");
+		out.flush();
+	}
+
 	public void transaction(Scanner input) throws MenuException {
 		// Collects balance before subtracting product price
-		String selection = input.nextLine();
+		String selection = input.nextLine().toUpperCase();
 		Product product = availableProducts.get(selection);
 		BigDecimal proposedBalance;
+		String productName;
 
 
 
 		// Checks if product exists
 
-		if (!availableProducts.containsKey(selection) || selection == null) {
+		if (!availableProducts.containsKey(selection)) {
 			throw new MenuException("*** " + selection + " is not a valid option ***");
 		}
 
 
 		// Checks if product is in stock
+		productName = product.getName();
 		if (availableProducts.get(selection).getStock() == 0) {
-			throw new MenuException(product.getName() + " is SOLD OUT, please select another.");
+			throw new MenuException(productName + " is SOLD OUT, please select another.");
 		}
 
 		// Checks if funds are sufficient
@@ -142,39 +194,18 @@ public class Menu {
 		// Execute the transaction
 		BigDecimal preCalculationBalance = balance;
 		balance = balance.subtract(product.getPrice());
-		out.println("\n" + product.getName() + ": $" + product.getPrice() +
+		out.println("\n" + productName + ": $" + product.getPrice() +
 				"\n$" + balance + " remaining");
 		out.flush();
 		product.dispense();
+
+		// Log to audit log and readies information for sales log
 		auditLog(product.getName(),  preCalculationBalance, balance);
+		// Increments amount of product sold
+		salesLogger.put(productName, salesLogger.get(productName) + 1);
 
 
 	}
-
-
-
-
-
-
-
-
-//
-//
-//		// Checks to see if funds are sufficient and executes accordingly
-//		if(balance.signum() > 0) { // If funds are sufficient
-//			out.println("\n" + product.getName() + ": $" + product.getPrice() + "\n$" + balance+ " remaining");
-//			out.flush();
-//			product.dispense();
-//		} else {
-//			balance = balance.add(product.getPrice());
-//			out.println("Insufficient funds. $" + balance.abs() + " required.");
-//			out.flush();
-//		}
-//
-//		// Clears the stream and audits the sale
-//		auditLog(product.getName(), preCalculationBalance, balance);
-
-//	}
 
 	public void finishTransaction() {
 		int quarters = 0;
@@ -209,17 +240,48 @@ public class Menu {
 		out.flush();
 	}
 
+
+	// ***** LOGGING FUNCTIONS *****
+
 	public void auditLog(String action, BigDecimal startingAmount, BigDecimal endingAmount) {
-				File log = new File("capstone/Log.txt");
-				try(PrintWriter writer = new PrintWriter(new FileOutputStream(log), true)) {
-					writer.write(">" + new Date() +
-							" " + action +
-							" $" + startingAmount +
-							" $" + endingAmount);
-					writer.flush();
-				} catch (Exception e) {
-					e.getMessage();
-				}
+
+		File log = new File("capstone/src/main/resources/log.txt");
+
+		try(PrintWriter writer = new PrintWriter(new FileOutputStream(log, true))) {
+			String pattern = "MM/dd/YYYY hh:mm:ss a";
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			String date = sdf.format(new Date());
+
+			writer.write(">" + date +
+					" " + action +
+					" $" + startingAmount +
+					" $" + endingAmount + "\n");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	public void generateSalesReport() {
+		String pattern = "MM-dd-YYYY_HHmmss";
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		String date = sdf.format(new Date());
+		File salesReport = new File("capstone/src/main/resources/sales_report_" + date + ".txt");
+		int totalSales = 0;
+
+		try(PrintWriter reportWriter = new PrintWriter(salesReport)) {
+			for(Map.Entry<String, Product> item : availableProducts.entrySet()) {
+				String productName = item.getValue().getName();
+				int amountSold = salesLogger.get(productName);
+
+				reportWriter.write(productName + "|" + amountSold + "\n");
+				totalSales += amountSold;
+			}
+			reportWriter.write("\n________________________\nTOTAL SALES|" + totalSales);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+		System.out.println("*** SALES REPORT GENERATED ***");
 	}
 
 }
