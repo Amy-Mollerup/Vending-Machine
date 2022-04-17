@@ -163,7 +163,7 @@ public class Menu {
 		out.flush();
 	}
 
-	public void transaction(Scanner input) throws MenuException {
+	public void selectProduct(Scanner input) throws MenuException {
 		// Collects balance before subtracting product price
 		String selection = input.nextLine().toUpperCase();
 		Product product = availableProducts.get(selection);

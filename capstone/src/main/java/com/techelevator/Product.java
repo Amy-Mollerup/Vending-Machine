@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public abstract class Product {
     private String name;
     private BigDecimal price;
-    private int stock = 5;
+    private int stock = 5; // Maximum stock is 5 for any item
 
     public Product(String name, BigDecimal price) {
         this.name = name;

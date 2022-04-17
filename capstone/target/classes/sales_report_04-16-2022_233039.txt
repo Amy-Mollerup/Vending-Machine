@@ -1,4 +1,4 @@
-Potato Crisps|0
+Potato Crisps|1
 Stackers|0
 Grain Waves|0
 Cloud Popcorn|0
@@ -16,4 +16,4 @@ Chiclets|0
 Triplemint|0
 
 ________________________
-TOTAL SALES|0
+TOTAL SALES|1

@@ -25,47 +25,54 @@ public class VendingMachineCLI {
 		this.menu = menu;
 	}
 
+	// Main Menu
 	public void run() {
 		while (true) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 
-			if (choice.equals(MAIN_MENU_OPTION_DISPLAY_ITEMS)) {
-				// display vending machine items
-				menu.displayItems();
-			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
-				// do purchase
-				purchase();
+			switch (choice) {
+				case MAIN_MENU_OPTION_DISPLAY_ITEMS ->
+						menu.displayItems();
 
-			} else if (choice.equalsIgnoreCase(MAIN_MENU_OPTION_EXIT)) {
-				// exit the application
-				System.exit(0);
-			} else if (choice.equalsIgnoreCase("Generate sales report")) {
-				menu.generateSalesReport();
+				case MAIN_MENU_OPTION_PURCHASE ->
+						purchase();
+
+				case MAIN_MENU_OPTION_EXIT ->
+						System.exit(0);
+
+				// Hidden option 4
+				case "Generate sales report" ->
+						menu.generateSalesReport();
 			}
 		}
 	}
 
+	// Purchase Menu
 	public void purchase() {
 		while(true) {
 			String choice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 			Scanner input = new Scanner(System.in);
 
-			if(choice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
-				// feed money menu
-				menu.feedMoney(input);
+			switch (choice) {
+				case PURCHASE_MENU_OPTION_FEED_MONEY ->
+						menu.feedMoney(input);
 
-			} else if(choice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
-				menu.displayForPurchase();
+				case PURCHASE_MENU_OPTION_SELECT_PRODUCT -> {
+					menu.displayForPurchase();
 
-				try {
-					menu.transaction(input);
-				} catch (MenuException e) {
-					System.out.println(e.getMessage() +"\n");
+					// Handles transaction and error cases
+					try {
+						menu.selectProduct(input);
+					} catch (MenuException e) {
+						System.out.println(e.getMessage() + "\n");
+					}
 				}
-			} else if(choice.equals(PURCHASE_MENU_OPTION_FINISH)) {
-				// exit the application
-				menu.finishTransaction();
-				run();
+
+				case PURCHASE_MENU_OPTION_FINISH -> {
+					// Returns change and goes back to main menu
+					menu.finishTransaction();
+					run();
+				}
 			}
 		}
 	}
