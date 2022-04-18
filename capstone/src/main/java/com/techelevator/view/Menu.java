@@ -56,7 +56,9 @@ public class Menu {
 	}
 
 	public static Map<String, Product> catalogueItems() {
-		File stockFile = new File("capstone/vendingmachine.csv");
+		String path = new File("").getAbsolutePath();
+
+		File stockFile = new File(path + "/vendingmachine.csv");
 		Map<String, Product> inventory = new TreeMap<>();
 		try (Scanner reader = new Scanner(stockFile)) {
 			while (reader.hasNextLine()) {
@@ -244,10 +246,11 @@ public class Menu {
 	// ***** LOGGING FUNCTIONS *****
 
 	public void auditLog(String action, BigDecimal startingAmount, BigDecimal endingAmount) {
+		String path = new File("").getAbsolutePath();
 
-		File log = new File("capstone/src/main/resources/log.txt");
+		File logFilePath = new File(path + "/src/main/resources/log.txt");
 
-		try(PrintWriter writer = new PrintWriter(new FileOutputStream(log, true))) {
+		try(PrintWriter writer = new PrintWriter(new FileOutputStream(logFilePath, true))) {
 			String pattern = "MM/dd/YYYY hh:mm:ss a";
 			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 			String date = sdf.format(new Date());
@@ -265,7 +268,8 @@ public class Menu {
 		String pattern = "MM-dd-YYYY_HHmmss";
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		String date = sdf.format(new Date());
-		File salesReport = new File("capstone/src/main/resources/sales_report_" + date + ".txt");
+		String path = new File("").getAbsolutePath();
+		File salesReport = new File(path + "/src/main/resources/sales_report_" + date + ".txt");
 		int totalSales = 0;
 
 		try(PrintWriter reportWriter = new PrintWriter(salesReport)) {

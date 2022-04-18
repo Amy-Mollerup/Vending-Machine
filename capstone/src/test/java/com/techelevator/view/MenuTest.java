@@ -3,13 +3,13 @@ package com.techelevator.view;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
-import com.techelevator.view.Menu;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MenuTest {
@@ -23,7 +23,7 @@ public class MenuTest {
 
 	@Test
 	public void displays_a_list_of_menu_options_and_prompts_user_to_make_a_choice() {
-		Object[] options = new Object[] { Integer.valueOf(3), "Blind", "Mice" };
+		Object[] options = new Object[] {3, "Blind", "Mice" };
 		Menu menu = getMenuForTesting();
 
 		menu.getChoiceFromOptions(options);
@@ -35,8 +35,8 @@ public class MenuTest {
 
 	@Test
 	public void returns_object_corresponding_to_user_choice() {
-		Integer expected = Integer.valueOf(456);
-		Integer[] options = new Integer[] { Integer.valueOf(123), expected, Integer.valueOf(789) };
+		Integer expected = 456;
+		Integer[] options = new Integer[] {123, expected, 789};
 		Menu menu = getMenuForTestingWithUserInput("2" + System.lineSeparator());
 
 		Integer result = (Integer) menu.getChoiceFromOptions(options);
@@ -90,6 +90,7 @@ public class MenuTest {
 
 		Assert.assertEquals(expected, output.toString());
 	}
+
 
 	private Menu getMenuForTestingWithUserInput(String userInput) {
 		ByteArrayInputStream input = new ByteArrayInputStream(String.valueOf(userInput).getBytes());

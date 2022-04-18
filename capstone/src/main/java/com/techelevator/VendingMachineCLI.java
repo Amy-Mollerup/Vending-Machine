@@ -16,7 +16,7 @@ public class VendingMachineCLI {
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
 	private static final String PURCHASE_MENU_OPTION_SELECT_PRODUCT = "Select Product";
 	private static final String PURCHASE_MENU_OPTION_FINISH = "Finish Transaction";
-	private static final String[] PURCHASE_MENU_OPTIONS = {PURCHASE_MENU_OPTION_FEED_MONEY, PURCHASE_MENU_OPTION_SELECT_PRODUCT, PURCHASE_MENU_OPTION_FINISH};
+	private static final String[] PURCHASE_MENU_OPTIONS = { PURCHASE_MENU_OPTION_FEED_MONEY, PURCHASE_MENU_OPTION_SELECT_PRODUCT, PURCHASE_MENU_OPTION_FINISH };
 
 
 	private Menu menu;
@@ -52,6 +52,7 @@ public class VendingMachineCLI {
 		while(true) {
 			String choice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 			Scanner input = new Scanner(System.in);
+
 
 			switch (choice) {
 				case PURCHASE_MENU_OPTION_FEED_MONEY ->
