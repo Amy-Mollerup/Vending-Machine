@@ -56,12 +56,17 @@ public class Menu {
 	}
 
 	public static Map<String, Product> catalogueItems() {
+		/* catalogueItems() collects information from vendingmachine.csv, processes it into Objects,
+		then inputs the data into a map, where the Key is the item codes, and the value is the Objects of the items.
+		 */
+
 		String path = new File("").getAbsolutePath();
 
 		File stockFile = new File(path + "/vendingmachine.csv");
 		Map<String, Product> inventory = new TreeMap<>();
 		try (Scanner reader = new Scanner(stockFile)) {
 			while (reader.hasNextLine()) {
+				// Splits the line on '|' delimiters then assigns each part to variables
 				String productInfo = reader.nextLine();
 				String[] infoSplit = productInfo.split("\\|");
 				String productCode = infoSplit[0];
@@ -69,8 +74,10 @@ public class Menu {
 				BigDecimal productPrice = new BigDecimal(infoSplit[2]);
 				String productType = infoSplit[3];
 
+				// Builds the names in salesLogger
 				salesLogger.put(productName, 0);
 
+				// Processes items into objects, will throw exception if an incorrect type is found.
 				switch (productType) {
 					case "Chip" -> inventory.put(productCode, new Chip(productName, productPrice));
 					case "Candy" -> inventory.put(productCode, new Candy(productName, productPrice));
@@ -88,6 +95,8 @@ public class Menu {
 	}
 
 	private void displayMenuOptions(Object[] options) {
+		/* displayMenuOptions() displays numbered options from an array for the user to choose from */
+
 		out.println();
 		for (int i = 0; i < options.length; i++) {
 			int optionNum = i + 1;
@@ -108,6 +117,7 @@ public class Menu {
 
 
 	public void displayItems() {
+		/* displayItems() displays the item codes, names, and prices */
 		for(Map.Entry<String, Product> productKey : availableProducts.entrySet()) {
 			Product product = productKey.getValue();
 			if(product.getStock() > 0) {
@@ -125,7 +135,10 @@ public class Menu {
 
 
 	public void feedMoney(Scanner input) {
-		// updates balance and displays it to the user.
+		/* feedMoney() allows the user to input money in $1, $2, $5, or $10 increments.
+		This function is implemented so that the user can enter money as many times as they would like before exiting.
+		These deposits are also entered into the audit log.
+		 */
 
 
 		while(true) {
@@ -166,6 +179,10 @@ public class Menu {
 	}
 
 	public void selectProduct(Scanner input) throws MenuException {
+		/* selectProduct() executes the sale, checking for exceptions,
+		subtracts balance accordingly, and logs the transaction
+		 */
+
 		// Collects balance before subtracting product price
 		String selection = input.nextLine().toUpperCase();
 		Product product = availableProducts.get(selection);
@@ -210,6 +227,8 @@ public class Menu {
 	}
 
 	public void finishTransaction() {
+		/* finishTransaction() returns the users change, then updates the audit log.
+		 */
 		int quarters = 0;
 		int dimes = 0;
 		int nickels = 0;
@@ -222,6 +241,7 @@ public class Menu {
 		out.println("Please take your change \n");
 
 
+		// Generates appropriate change amounts
 		while(balance.compareTo(BigDecimal.ZERO) > 0) {
 			if(balance.compareTo(QUARTER_VALUE) >= 0) {
 				balance = balance.subtract(QUARTER_VALUE);
@@ -246,6 +266,9 @@ public class Menu {
 	// ***** LOGGING FUNCTIONS *****
 
 	public void auditLog(String action, BigDecimal startingAmount, BigDecimal endingAmount) {
+	/* auditLog() posts all actions taken in the machine to a log.txt file.
+	Includes the time and date, action taken, and the starting and ending balance of each action.
+	 */
 		String path = new File("").getAbsolutePath();
 
 		File logFilePath = new File(path + "/src/main/resources/log.txt");
@@ -265,6 +288,9 @@ public class Menu {
 	}
 
 	public void generateSalesReport() {
+	/* generateSalesReport() generates a sales report when you press an option beyond the scope of visible menu options.
+	For the default implementation this is option 4.
+	 */
 		String pattern = "MM-dd-YYYY_HHmmss";
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		String date = sdf.format(new Date());
