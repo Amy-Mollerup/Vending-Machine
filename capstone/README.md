@@ -1,5 +1,10 @@
 ## Module 1 Capstone - Vending Machine Software
 
+This project uses file reading to collect information from a source file containing basic information about products that might be sold in a vending machine, parse the data, and create a UI where the user can interact with a command line program to 'Insert Money', view a menu, and 'Buy a Product'. Includes handling of logging to show what actions have been taken and an optional hidden menu option that prints out all transactions that have been made since the machine started in a simple sales report. The original requirements that have been met are listed below.
+
+
+### Description
+
 You've been asked to develop an application for the newest vending machine distributor,
 Umbrella Corp. They've released a new vending machine, Vendo-Matic 800, that is integrated
 with everyone's bank accounts, allowing customers to purchase products from their computers for their convenience.
